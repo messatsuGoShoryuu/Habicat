@@ -75,7 +75,11 @@ namespace jam
 
         public Sprite GetSprite() { return m_sprites[m_level]; }
         public int Level { get { return m_level; } }
-        public void Upgrade() { ++m_level; }
+        public void Upgrade()
+        {
+            GameState.ConsumeTitanium(1);
+            ++m_level;
+        }
 
         private int m_workerCatCount;
         public bool IsConnected { protected set; get; }
@@ -199,21 +203,39 @@ namespace jam
 
         private void OnMouseDown()
         {
+            if (UIManager.IsActive) return;
             SetColor(m_clicked);
             MENU_FLAGS flags = building == null ? MENU_FLAGS.BUILD : building.Flags;
+            EventSystem.RemoveListener<Event_UIBuild>(OnBuild);
+            EventSystem.RemoveListener<Event_UIUpgrade>(OnUpgrade);
+            EventSystem.RemoveListener<Event_UIWorker>(OnWorker);
 
             List<GameObject> prefabs = new List<GameObject>();
             if (IsFlagSet(flags, MENU_FLAGS.BUILD))
             {
-                prefabs.Add(GameObject.Instantiate(Resources.Load("Prefabs/Build")) as GameObject);
+                prefabs.Add(GameObject.Instantiate(Resources.Load("Prefabs/Build")) as GameObject);   
                 EventSystem.AddListener<Event_UIBuild>(OnBuild);
             }
             if (IsFlagSet(flags, MENU_FLAGS.UPGRADE))
+            {
                 prefabs.Add(GameObject.Instantiate(Resources.Load("Prefabs/Upgrade")) as GameObject);
+                EventSystem.Dispatch(new Event_UIUpgrade());
+            }
             if (IsFlagSet(flags, MENU_FLAGS.WORKER))
                 prefabs.Add(GameObject.Instantiate(Resources.Load("Prefabs/Worker")) as GameObject);
 
             EventSystem.Dispatch(new Event_BuildMenu(prefabs.ToArray()));
+            Debug.Log("Mouse down");
+
+        }
+
+        private void OnUpgrade(Event_UIUpgrade e)
+        {
+
+        }
+
+        private void OnWorker(Event_UIWorker e)
+        {
 
         }
 

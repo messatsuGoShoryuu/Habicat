@@ -91,6 +91,15 @@ namespace jam
             return true;
         }
 
+        public static bool ConsumeTitanium(float amount)
+        {
+            if (Instance.m_titanium <= 0) return false;
+            Instance.m_titanium -= amount;
+            Instance.m_titanium = Mathf.Clamp(Instance.m_titanium, 0.0f, Instance.m_titanium);
+
+            return true;
+        }
+
         private bool CheckGameOver()
         {
             m_gameOver = false;
